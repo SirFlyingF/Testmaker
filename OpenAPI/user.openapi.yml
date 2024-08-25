@@ -1,0 +1,356 @@
+openapi: 3.0.0
+info:
+  title: User Management API
+  description: API for user registration, authentication, password reset, and token management.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+paths:
+  /users/register/:
+    post:
+      summary: Register a new user
+      description: Create a new user and send an email for verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password1:
+                  type: string
+                  format: password
+                password2:
+                  type: string
+                  format: password
+                display_name:
+                  type: string
+              required:
+                - email
+                - password1
+                - password2
+                - display_name
+      responses:
+        '200':
+          description: Successfully sent verification email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully sent temporary password to email
+        '400':
+          description: Error in user registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+
+  /users/verify-user/:
+    get:
+      summary: Verify user email
+      description: Verify the user's email address using the token provided in the query parameters.
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Email verified successfully. Please Login to continue
+        '400':
+          description: Error in email verification
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+
+  /users/login/:
+    post:
+      summary: User login
+      description: Authenticate a user and return access and refresh tokens.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      access:
+                        type: string
+                      refresh:
+                        type: string
+        '400':
+          description: Error in login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+
+  /users/refresh-token/:
+    post:
+      summary: Refresh JWT token
+      description: Refresh the access and refresh tokens using the provided refresh token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh:
+                  type: string
+              required:
+                - refresh
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      access:
+                        type: string
+                      refresh:
+                        type: string
+        '401':
+          description: Unauthorized, invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+
+  /users/forgot-password/:
+    post:
+      summary: Send password reset email
+      description: Sends an email with a new randomly generated password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      responses:
+        '200':
+          description: Password reset email sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Successfully sent temporary password to email
+        '400':
+          description: Error in sending password reset email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+
+  /users/reset-password/:
+    post:
+      summary: Set a new password
+      description: Allows a user to set a new password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password1:
+                  type: string
+                password2:
+                  type: string
+              required:
+                - password1
+                - password2
+      responses:
+        '200':
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Password updated successfully
+        '400':
+          description: Error in updating password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
