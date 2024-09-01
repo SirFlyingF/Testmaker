@@ -313,9 +313,12 @@ paths:
                   type: string
                 password2:
                   type: string
+                oldPassword:
+                  type: string
               required:
                 - password1
                 - password2
+                - oldPassword
       responses:
         '200':
           description: Password updated successfully
@@ -342,6 +345,107 @@ paths:
                     example: false
                   error:
                     type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+
+  /users/:
+    put:
+      summary: Update User details
+      description: Allows a user to update its details - currently only Display Name.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+              required:
+                - displayName
+      responses:
+        '200':
+          description: Details updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: User details updated successfully
+        '404':
+          description: Error in updating details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: User not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+    get:
+      summary: Get User Details
+      description: Allows a user to retrieve its account details.
+      responses:
+        '200':
+          description: Details updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: int
+                  displayName:
+                    type: string
+                  dateJoined:
+                    type: datetime
+                  lastLogin:
+                    type: datetime
+                  email:
+                    type: string
+        '404':
+          description: Error in retrieving information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: User not found
         '500':
           description: Internal server error
           content:

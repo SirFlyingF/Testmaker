@@ -2,9 +2,9 @@ from django.views import View
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.urls import reverse_lazy
-from .models import User
-from testmaker.utils.responses import *
-from testmaker.utils.permissions import CustomLoginRequiredMixin
+from common.models import User
+from common.utils.responses import *
+from common.utils.permissions import CustomLoginRequiredMixin
 from datetime import datetime, timedelta
 import jwt
 import random
@@ -32,6 +32,10 @@ class RegisterAPI(View):
         if uzr := User.objects.filter(email=email).first():
             if uzr.is_active:
                 return ErrorResponse('User already exists. Try forget password')
+            else:
+                uzr.display_name = display_name
+                uzr.set_password(password1)
+                uzr.save()
         else:
             uzr = User.objects.create_user(email=email, password=password1, display_name=display_name)
 
@@ -79,25 +83,30 @@ class LoginAPI(View):
         try:
             request_data = json.loads(request.body)
             email, password = request_data.get('email'), request_data.get('password')
+            now = datetime.now()
             
             user = User.objects.filter(email=email).first()
             if not user:
                 return ErrorResponse(f'User does not exist')
             if not user.check_password(password):
-                return ErrorResponse(f'Incorrect password')
+                return ErrorResponse(f'Password is invalid')
+
+            user.last_login = now
+            user.save()
             
             claimset = {
+                'id' : user.id,
                 'email' : user.email,
                 'isActive' : user.is_active,
                 'isStaff' : user.is_staff,
                 'isSuperuser' : user.is_superuser,
                 'type' : 'ACCESS',
-                'exp' : datetime.now()+timedelta(minutes=5)
+                'exp' : now+timedelta(minutes=5)
             }
             a_token = jwt.encode(claimset, settings.JWT_SECRET, algorithm="HS256")
 
             claimset['type'] = 'REFRESH'
-            claimset['exp'] = datetime.now()+timedelta(minutes=60)
+            claimset['exp'] = now+timedelta(minutes=60)
             r_token = jwt.encode(claimset, settings.JWT_SECRET, algorithm="HS256")
 
             ctx = {
@@ -162,15 +171,53 @@ class NewPasswordAPI(CustomLoginRequiredMixin, View):
     '''API to set a randomly generated new password'''
     def post(self, request):
         request_data = json.loads(request.body)
+        old_password = request_data.get('oldPassword')
         password1, password2 = request_data.get('password1'), request_data.get('password2')
+
         if not password1 or not password2 or not (password1 == password2):
             return ErrorResponse('New password did not match confirm password', 400)
-        
-        user = request.META.get('user')
         try:
-            user = User.objects.filter(email=user.get('email')).first()
-            user.set_password(password1)
-            user.save()
+            user = request.META.get('user')
+            uzr = User.objects.filter(email=user.get('email')).first()
+            if uzr.check_password(old_password):
+                uzr.set_password(password1)
+                uzr.save()
+            else:
+                return ErrorResponse('Old password is incorrect', status=400)
         except Exception as e:
             return ErrorResponse(str(e), 500)    
         return MessageResponse('Password updated successfully')
+
+
+class UserDetailAPI(CustomLoginRequiredMixin, View):
+    '''API to manipulate User data'''
+    def put(self, request):
+        user_id = request.META.get('user').get('id')
+        request_data = json.loads(request.body)
+        try:
+            if uzr := User.objects.filter(pk=user_id).first():
+                uzr.display_name = request_data.get('displayName')
+                uzr.save()
+            else:
+                return ErrorResponse('User not found', status=404)
+        except Exception as e:
+            return ErrorResponse(str(e), 500)
+        return MessageResponse('User details updated successfully')
+    
+
+    def get(self, request):
+        user_id = request.META.get('user').get('id')
+        try:
+            if uzr := User.objects.filter(pk=user_id).first():
+                resp = {
+                    'id': uzr.pk,
+                    'email': uzr.email,
+                    'displayName' : uzr.display_name,
+                    'dateJoined' : uzr.date_joined,
+                    'lastLogin' : uzr.last_login
+                }
+            else:
+                return ErrorResponse('User not found', status=404)
+        except Exception as e:
+            return ErrorResponse(str(e), 500)
+        return SuccessResponse(data=resp, status=200)

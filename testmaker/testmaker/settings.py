@@ -30,8 +30,9 @@ SECRET_KEY = 'django-insecure-yfwj+dw*g6v(k05b5slvmw)n_e+$_=z&myw3x72iyj+d3#0ah_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ['*']
-
+CORS_ORIGIN_ALLOW_ALL = False
+ALLOWED_HOSTS = os.getenv('ALLOW_CORS').split(',')
+CORS_ORIGIN_WHITELIST = os.getenv('ALLOW_CORS').split(',')
 
 # Application definition
 
@@ -42,9 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders'
 ]
 
 INSTALLED_APPS += [
+    'common',
     'user'
 ]
 
@@ -56,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'testmaker.urls'
@@ -131,7 +135,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'common.User'
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
