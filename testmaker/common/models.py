@@ -26,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField()
+    last_login = models.DateTimeField(null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -36,5 +36,79 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.display_name} - {self.email} - {'Staff' if self.is_staff else 'Student'}"
     
-    class META:
+    class Meta:
+        db_table = 'user'
+        managed = True
+
+
+class Chapter(models.Model):
+    PATIENT_CARE = 1
+    SAFETY = 2
+    IMAGE_PRODUCTION = 3
+    PROCEDURES = 4
+    module_choices = [
+        (PATIENT_CARE, 'Patient Care'),
+        (SAFETY, 'Safety'),
+        (IMAGE_PRODUCTION, 'Image Production'),
+        (PROCEDURES, 'Procedures')
+    ]
+
+    name = models.CharField(max_length=64)
+    module = models.IntegerField(choices=module_choices)
+
+    class Meta:
+        db_table = 'chapter'
+        managed = True
+
+
+class Question(models.Model):
+    MCQ = 1
+    MSQ = 2
+    TFQ = 3
+    type_choices = [
+        (MCQ, 'Multiple Choice Question'),
+        (MSQ, 'Multiple Select Question'),
+        (TFQ, 'True or False')
+    ]
+
+    text = models.TextField()
+    type = models.IntegerField(choices=type_choices, default=MCQ)
+    option_a = models.CharField(max_length=128)
+    option_b = models.CharField(max_length=128)
+    option_c = models.CharField(max_length=128, null=True, blank=True)
+    option_d = models.CharField(max_length=128, null=True, blank=True)
+    answer_key = models.CharField(max_length=4)
+    # image = models.ImageField(upload_to='')
+    chapter = models.ForeignKey('Chapter', on_delete=models.DO_NOTHING, db_constraint=False)
+    obsolete_ind = models.BooleanField(default=False)
+    created_dt_tm = models.DateTimeField(auto_now_add=True)
+    updt_dt_tm = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'question'
+        managed = True
+
+
+class Test(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, db_constraint=False)
+    name = models.CharField(max_length=64)
+    start_dt_tm = models.DateTimeField(null=True)
+    end_dt_tm = models.DateTimeField(null=True)
+    score = models.FloatField(null=True)
+    updt_dt_tm = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'test'
+        managed = True
+
+
+class QuestionTest(models.Model):
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, db_constraint=False)
+    test = models.ForeignKey('Test', on_delete=models.CASCADE, db_constraint=False)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, db_constraint=False)
+    answer = models.BooleanField(default=None, null=True)
+    elapsed_time = models.DurationField(null=True)
+
+    class Meta:
+        db_table = 'question_test_reltn'
         managed = True
