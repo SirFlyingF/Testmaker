@@ -30,9 +30,8 @@ SECRET_KEY = 'django-insecure-yfwj+dw*g6v(k05b5slvmw)n_e+$_=z&myw3x72iyj+d3#0ah_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-CORS_ORIGIN_ALLOW_ALL = False
-ALLOWED_HOSTS = os.getenv('ALLOW_CORS').split(',')
-CORS_ORIGIN_WHITELIST = os.getenv('ALLOW_CORS').split(',')
+CORS_ORIGIN_ALLOW_ALL = True
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
