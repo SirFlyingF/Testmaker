@@ -31,4 +31,4 @@ def UnauthorizedResponse(msg=None, *args, **kwargs):
         "result" : False,
         "error" : msg or "Unauthorized Access"
     }
-    return JsonResponse(response, status=403)
+    return JsonResponse(response, status=401)
