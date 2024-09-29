@@ -22,7 +22,7 @@ COPY . /app/
 ENV PYTHONPATH=/app/imaginglab
 
 # Run collectstatic to gather static files
-RUN python3 manage.py collectstatic --noinput
+RUN python3 Django/manage.py collectstatic --noinput
 
 # Expose the port that the Django app will run on
 EXPOSE 8000
