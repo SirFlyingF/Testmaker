@@ -19,10 +19,10 @@ RUN pip3 install --upgrade pip && \
 COPY . /app/
 
 # Set Pythonpath for gunicorn to be able to find wsgi app object
-ENV PYTHONPATH=/app/testmaker
+ENV PYTHONPATH=/app/imaginglab
 
 # Expose the port that the Django app will run on
 EXPOSE 8000
 
 # Run the Django app with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "testmaker.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "imaginglab.wsgi:application"]

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -112,3 +113,29 @@ class QuestionTest(models.Model):
     class Meta:
         db_table = 'question_test_reltn'
         managed = True
+
+
+# class MediaFiles(models.Model):
+#     PHYSICS = 1
+#     BIOLOGY = 2
+#     CONTRAST_MEDIA = 3
+#     PATHOLOGY = 4
+#     module_choices = [
+#         (PHYSICS, 'Radiologic Physics'),
+#         (BIOLOGY, 'Radiation Biology'),
+#         (CONTRAST_MEDIA, 'Contrast Media'),
+#         (PATHOLOGY, 'Pathology')
+#     ]
+
+#     file_url = models.FileField(upload_to=settings.)
+#     thumbnail_url = models.FileField(upload_to=settings.)
+#     filename = models.CharField(max_length=256)
+#     module = models.IntegerChoices(choices=module_choices)
+
+#     def save(self, *args, **kwargs):
+#         # Gets the 
+#         pass
+
+#     class Meta:
+#         db_table = 'media_files'
+#         managed = True

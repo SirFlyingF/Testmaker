@@ -1,5 +1,5 @@
 """
-WSGI config for testmaker project.
+WSGI config for imaginglab project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'testmaker.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'imaginglab.settings')
 
 application = get_wsgi_application()
