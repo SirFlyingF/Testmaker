@@ -19,7 +19,7 @@ RUN pip3 install --upgrade pip && \
 COPY . /app/
 
 # Set Pythonpath for gunicorn to be able to find wsgi app object
-ENV PYTHONPATH=/app/imaginglab
+ENV PYTHONPATH=/app
 
 # Run collectstatic to gather static files
 RUN python3 Django/manage.py collectstatic --noinput
