@@ -21,6 +21,9 @@ COPY . /app/
 # Set Pythonpath for gunicorn to be able to find wsgi app object
 ENV PYTHONPATH=/app/imaginglab
 
+# Run collectstatic to gather static files
+RUN python3 manage.py collectstatic --noinput
+
 # Expose the port that the Django app will run on
 EXPOSE 8000
 
