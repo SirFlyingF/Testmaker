@@ -20,7 +20,7 @@ services:
     volumes:
       - ./Nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - /home/ec2-user:/etc/nginx/ssl
-      - static_volume:/staticfiles
+      - static_volume:/app/staticfiles
     ports:
       - "80:80"
       - "443:443"
