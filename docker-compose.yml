@@ -6,7 +6,7 @@ services:
     volumes:
       - static_volume:/app/staticfiles
     env_file:
-      - ..Django/.env
+      - ./Django/.env
     expose:
       - "8000"
     networks:
