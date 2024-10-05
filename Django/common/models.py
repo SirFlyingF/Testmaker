@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.conf import settings
+from django.core.files.base import ContentFile
+from io import BytesIO
+import pypdfium2, os
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -8,7 +11,7 @@ class UserManager(BaseUserManager):
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
-        user.is_active = False
+        user.is_active = extra_fields.get('is_active', False)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -43,19 +46,32 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Chapter(models.Model):
-    PATIENT_CARE = 1
-    SAFETY = 2
-    IMAGE_PRODUCTION = 3
-    PROCEDURES = 4
-    module_choices = [
+    PATIENT_CARE = 11
+    SAFETY = 12
+    IMAGE_PRODUCTION = 13
+    PROCEDURES = 14
+    XRay_choices = [
         (PATIENT_CARE, 'Patient Care'),
         (SAFETY, 'Safety'),
         (IMAGE_PRODUCTION, 'Image Production'),
         (PROCEDURES, 'Procedures')
     ]
 
+    PHYSICS = 21
+    BIOLOGY = 22
+    CONTRAST_MEDIA = 23
+    PATHOLOGY = 24
+    MRI_choices = [
+        (PHYSICS, 'Radiologic Physics'),
+        (BIOLOGY, 'Radiation Biology'),
+        (CONTRAST_MEDIA, 'Contrast Media'),
+        (PATHOLOGY, 'Pathology')
+    ]
+
+    chapter_choices = XRay_choices + MRI_choices
+
     name = models.CharField(max_length=64)
-    module = models.IntegerField(choices=module_choices)
+    module = models.IntegerField(choices=chapter_choices)
 
     class Meta:
         db_table = 'chapter'
@@ -115,27 +131,57 @@ class QuestionTest(models.Model):
         managed = True
 
 
-# class MediaFiles(models.Model):
-#     PHYSICS = 1
-#     BIOLOGY = 2
-#     CONTRAST_MEDIA = 3
-#     PATHOLOGY = 4
-#     module_choices = [
-#         (PHYSICS, 'Radiologic Physics'),
-#         (BIOLOGY, 'Radiation Biology'),
-#         (CONTRAST_MEDIA, 'Contrast Media'),
-#         (PATHOLOGY, 'Pathology')
-#     ]
+class MediaFile(models.Model):
+    PATIENT_CARE = 11
+    SAFETY = 12
+    IMAGE_PRODUCTION = 13
+    PROCEDURES = 14
+    XRay_choices = [
+        (PATIENT_CARE, 'Patient Care'),
+        (SAFETY, 'Safety'),
+        (IMAGE_PRODUCTION, 'Image Production'),
+        (PROCEDURES, 'Procedures')
+    ]
 
-#     file_url = models.FileField(upload_to=settings.)
-#     thumbnail_url = models.FileField(upload_to=settings.)
-#     filename = models.CharField(max_length=256)
-#     module = models.IntegerChoices(choices=module_choices)
+    PHYSICS = 21
+    BIOLOGY = 22
+    CONTRAST_MEDIA = 23
+    PATHOLOGY = 24
+    MRI_choices = [
+        (PHYSICS, 'Radiologic Physics'),
+        (BIOLOGY, 'Radiation Biology'),
+        (CONTRAST_MEDIA, 'Contrast Media'),
+        (PATHOLOGY, 'Pathology')
+    ]
 
-#     def save(self, *args, **kwargs):
-#         # Gets the 
-#         pass
+    chapter_choices = XRay_choices + MRI_choices
 
-#     class Meta:
-#         db_table = 'media_files'
-#         managed = True
+    title = models.CharField(max_length=256, blank=False, help_text="This will be displayed to the user")
+    module = models.IntegerField(choices=chapter_choices) #Use FK for granularity
+    file = models.FileField(upload_to='labpdfs/')
+    thumbnail = models.ImageField(upload_to='labpdfs/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Generate a thumbnail from uploaded pdf
+        if self.file:
+            try:
+                fname, ftype = os.path.splitext(self.file.name)
+                if not ftype.lower() == '.pdf':
+                    raise TypeError('Unsupported Filetype')
+                
+                pdf = pypdfium2.PdfDocument(self.file.file)
+                pil_image = pdf.get_page(0).render(scale=1).to_pil()
+
+                bytebuffer = BytesIO()
+                pil_image.save(bytebuffer, 'PNG')
+                bytebuffer.seek(0)
+                self.thumbnail.save(f'thumbnail_{fname}.png', ContentFile(bytebuffer.read()), save=False)
+            except Exception as e:
+                raise e
+            finally:
+                bytebuffer.close()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'media_files'
+        managed = True

@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.http import HttpResponse
+from labreview.urls import xrayurls, mriurls
 
 def healthcheck(request):
     return HttpResponse('I am doing great, thanks for asking')
@@ -24,6 +25,10 @@ def healthcheck(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('tinymce/', include('tinymce.urls')),
+
     path('how-you-doin/', healthcheck),
     path('users/', include('user.urls')),
+    path('xray/', include(xrayurls)),
+    path('mri/', include(mriurls)),
 ]

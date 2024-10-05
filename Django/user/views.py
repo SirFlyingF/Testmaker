@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 from django.urls import reverse_lazy
 from common.models import User
 from common.utils.responses import *
-from common.utils.permissions import CustomLoginRequiredMixin
+from common.utils.permissions import JWTRequiredMixin
 from datetime import datetime, timedelta
 import jwt
 import random
@@ -167,7 +167,7 @@ class PasswordResetMailerAPI(View):
         return ErrorResponse('User does not exist', 400)
 
 
-class NewPasswordAPI(CustomLoginRequiredMixin, View):
+class NewPasswordAPI(JWTRequiredMixin, View):
     '''API to set a randomly generated new password'''
     def post(self, request):
         request_data = json.loads(request.body)
@@ -189,7 +189,7 @@ class NewPasswordAPI(CustomLoginRequiredMixin, View):
         return MessageResponse('Password updated successfully')
 
 
-class UserDetailAPI(CustomLoginRequiredMixin, View):
+class UserDetailAPI(JWTRequiredMixin, View):
     '''API to manipulate User data'''
     def put(self, request):
         user_id = request.META.get('user').get('id')

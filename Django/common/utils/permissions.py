@@ -3,7 +3,7 @@ from django.conf import settings
 import jwt
 
 
-class CustomLoginRequiredMixin:
+class JWTRequiredMixin:
     '''
     Decodes JWT and attaches claimset to request.
     We will avoid using Django's middleware that attaches a User object.
