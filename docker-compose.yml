@@ -11,8 +11,6 @@ services:
       - "8000"
     networks:
       - my_network
-    depends_on:
-      - nginx
     # entrypoint: ["/app/entrypoint.sh"]
 
   nginx:
@@ -26,6 +24,8 @@ services:
       - "443:443"
     networks:
       - my_network
+    depends_on:
+      - web
 
 volumes:
   static_volume:
