@@ -22,10 +22,10 @@ COPY . /app/
 ENV PYTHONPATH=/app
 
 # Run collectstatic to gather static files
-RUN python3 manage.py collectstatic --noinput
+# RUN python3 manage.py collectstatic --noinput
 
 # Expose the port that the Django app will run on
 EXPOSE 8000
 
 # Run the Django app with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "imaginglab.wsgi:application"]
+CMD ["sh", "-c", "python3 manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 imaginglab.wsgi:application"]
