@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - static_volume:/app/staticfiles
+    env_file:
+      - .env
     expose:
       - "8000"
     networks:
