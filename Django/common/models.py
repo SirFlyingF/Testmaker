@@ -180,7 +180,7 @@ class MediaFile(models.Model):
 
             super().save(*args, **kwargs)
         except Exception as e:
-            print(f'{str(e)} - {fname}, {True if pil_image else False} - {True if self.file.file else False}')
+            print(f'{str(e)} - {fname}, {True if pil_image else False} - {True if self.thumbnail.file else False}')
         finally:
             if 'bytebuffer' in locals():
                 bytebuffer.close()
