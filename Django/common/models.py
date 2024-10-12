@@ -164,7 +164,6 @@ class MediaFile(models.Model):
     def save(self, *args, **kwargs):
         # Generate a thumbnail from uploaded pdf
         try:
-            super().save(*args, **kwargs)
             if self.file:
                 fname, ftype = os.path.splitext(self.file.name)
                 if not ftype.lower() == '.pdf':
@@ -176,6 +175,7 @@ class MediaFile(models.Model):
                 bytebuffer = BytesIO()
                 pil_image.save(bytebuffer, 'PNG')
                 bytebuffer.seek(0)
+                
                 thumbnail_fname = f"thumbnail_{fname}.png"
                 self.thumbnail.save(thumbnail_fname, ContentFile(bytebuffer.read(), thumbnail_fname), save=False)
 
