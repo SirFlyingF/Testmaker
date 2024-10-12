@@ -158,8 +158,8 @@ class MediaFile(models.Model):
 
     title = models.CharField(max_length=256, blank=False, help_text="This will be displayed to the user")
     module = models.IntegerField(choices=chapter_choices) #Use FK for granularity
-    file = models.FileField(upload_to='/')
-    thumbnail = models.ImageField(upload_to='/', blank=True, null=True)
+    file = models.FileField(upload_to='files')
+    thumbnail = models.ImageField(upload_to='files', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Generate a thumbnail from uploaded pdf
@@ -170,12 +170,17 @@ class MediaFile(models.Model):
                     raise TypeError('Unsupported Filetype')
                 
                 pdf = pypdfium2.PdfDocument(self.file.file)
+                print('1 - got pdf')
                 pil_image = pdf.get_page(0).render(scale=1).to_pil()
+                print('2 - got img')
 
                 bytebuffer = BytesIO()
+                print('3 - got bytebuff')
                 pil_image.save(bytebuffer, 'PNG')
+                print('4 - image to bytebuff')
                 bytebuffer.seek(0)
                 self.thumbnail.save(f'thumbnail_{fname}.png', ContentFile(bytebuffer.read()), save=False)
+                print('5 - saved thumbnail')
             except Exception as e:
                 print(str(e) + f'{fname}, {True if pil_image else False} - {True if self.file.file else False}')
                 pass
