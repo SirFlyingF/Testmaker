@@ -158,8 +158,8 @@ class MediaFile(models.Model):
 
     title = models.CharField(max_length=256, blank=False, help_text="This will be displayed to the user")
     module = models.IntegerField(choices=chapter_choices) #Use FK for granularity
-    file = models.FileField(upload_to='labpdfs/')
-    thumbnail = models.ImageField(upload_to='labpdfs/', blank=True, null=True)
+    file = models.FileField(upload_to='labpdfs')
+    thumbnail = models.ImageField(upload_to='labpdfs', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Generate a thumbnail from uploaded pdf
@@ -177,7 +177,7 @@ class MediaFile(models.Model):
                 bytebuffer.seek(0)
                 self.thumbnail.save(f'thumbnail_{fname}.png', ContentFile(bytebuffer.read()), save=False)
             except Exception as e:
-                raise e
+                pass
             finally:
                 bytebuffer.close()
         super().save(*args, **kwargs)
