@@ -182,7 +182,7 @@ class MediaFile(models.Model):
 
             super().save(*args, **kwargs)
         except Exception as e:
-            print(f'{str(e)} - {self.thumbnail.file if self.thumbnail else '-'} - {self.thumbnail.name if self.thumbnail.name else '-'}')
+            print(f"{str(e)} - {self.thumbnail.file if self.thumbnail else '-'} - {self.thumbnail.name if self.thumbnail.name else '-'}")
         finally:
             if 'bytebuffer' in locals():
                 bytebuffer.close()
