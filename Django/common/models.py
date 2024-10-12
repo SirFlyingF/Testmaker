@@ -95,7 +95,7 @@ class Question(models.Model):
     option_c = models.CharField(max_length=128, null=True, blank=True)
     option_d = models.CharField(max_length=128, null=True, blank=True)
     answer_key = models.CharField(max_length=4)
-    # image = models.ImageField(upload_to='')
+    image = models.ImageField(upload_to='question-images', null=True, blank=True)
     chapter = models.ForeignKey('Chapter', on_delete=models.DO_NOTHING, db_constraint=False)
     obsolete_ind = models.BooleanField(default=False)
     created_dt_tm = models.DateTimeField(auto_now_add=True)
@@ -163,36 +163,28 @@ class MediaFile(models.Model):
 
     def save(self, *args, **kwargs):
         # Generate a thumbnail from uploaded pdf
-        if self.file:
-            try:
+        try:
+            if self.file:
                 fname, ftype = os.path.splitext(self.file.name)
                 if not ftype.lower() == '.pdf':
                     raise TypeError('Unsupported Filetype')
                 
                 pdf = pypdfium2.PdfDocument(self.file.file)
-                print('1 - got pdf')
                 pil_image = pdf.get_page(0).render(scale=1).to_pil()
-                print('2 - got img')
 
                 bytebuffer = BytesIO()
-                print('3 - got bytebuff')
                 pil_image.save(bytebuffer, 'PNG')
-                print('4 - image to bytebuff')
-                bytebuffer.seek(0, 0)
-                params = {
-                    'name' : f'thumbnail_{fname}.png',
-                    'content' : ContentFile(bytebuffer.read()),
-                    'save' : False
-                }
-                print (params)
-                self.thumbnail.save(**params)
-                print('5 - saved thumbnail')
-            except Exception as e:
-                print(str(e) + f'{fname}, {True if pil_image else False} - {True if self.file.file else False}')
-                pass
-            finally:
+                bytebuffer.seek(0)
+                print(';saving thumbnail')
+                self.thumbnail.save(f"thumbnail_{fname}.png", ContentFile(bytebuffer.read()), save=False)
+            print('super.save')
+            super().save(*args, **kwargs)
+            print('saved')
+        except Exception as e:
+            print(str(e) + f'{fname}, {True if pil_image else False} - {True if self.file.file else False}')
+        finally:
+            if 'bytebuffer' in locals():
                 bytebuffer.close()
-        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'media_files'
