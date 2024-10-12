@@ -177,6 +177,7 @@ class MediaFile(models.Model):
                 bytebuffer.seek(0)
                 self.thumbnail.save(f'thumbnail_{fname}.png', ContentFile(bytebuffer.read()), save=False)
             except Exception as e:
+                print(str(e) + f'{fname}, {True if pil_image else False} - {True if self.file.file else False}')
                 pass
             finally:
                 bytebuffer.close()
