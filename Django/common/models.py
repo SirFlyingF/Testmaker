@@ -177,14 +177,12 @@ class MediaFile(models.Model):
                 bytebuffer.seek(0)
 
                 thumbnail_fname = f"thumbnail_{fname}.png"
-                # self.thumbnail.name = thumbnail_fname
-                # self.thumbnail.file = ContentFile(bytebuffer.read())
-                self.thumbnail.field = self
-                self.thumbnail.save(thumbnail_fname, ContentFile(bytebuffer.read(), thumbnail_fname), save=False)
+                self.thumbnail.name = thumbnail_fname
+                self.thumbnail.file = ContentFile(bytebuffer.read(), thumbnail_fname)
 
             super().save(*args, **kwargs)
         except Exception as e:
-            print(f'{str(e)} - {self.file.file}')
+            print(f'{str(e)} - {self.thumbnail.file if self.thumbnail else '-'} - {self.thumbnail.name if self.thumbnail.name else '-'}')
         finally:
             if 'bytebuffer' in locals():
                 bytebuffer.close()
