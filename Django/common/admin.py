@@ -10,6 +10,7 @@ class MediaFileAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields.pop('thumbnail', None)
+        print('request - ', request.GET, request.POST, request.FILE, request.body)
         return form
     
 
