@@ -158,7 +158,7 @@ class MediaFile(models.Model):
 
     title = models.CharField(max_length=256, blank=False, help_text="This will be displayed to the user")
     module = models.IntegerField(choices=chapter_choices) #Use FK for granularity
-    file = models.FileField(upload_to='files')
+    file = models.FileField(upload_to='files', null=True, blank=True)
     thumbnail = models.ImageField(upload_to='files', blank=True, null=True)
 
     def save(self, *args, **kwargs):
