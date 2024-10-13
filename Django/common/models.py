@@ -154,10 +154,10 @@ class MediaFile(models.Model):
         (PATHOLOGY, 'Pathology')
     ]
 
-    chapter_choices = XRay_choices + MRI_choices
+    module_choices = XRay_choices + MRI_choices
 
     title = models.CharField(max_length=256, blank=False, help_text="This will be displayed to the user")
-    module = models.IntegerField(choices=chapter_choices) #Use FK for granularity
+    module = models.IntegerField(choices=module_choices) #Use FK for granularity
     file = models.FileField(upload_to='files', null=True, blank=True)
     thumbnail = models.ImageField(upload_to='files', blank=True, null=True)
 
@@ -183,6 +183,9 @@ class MediaFile(models.Model):
         finally:
             if 'bytebuffer' in locals():
                 bytebuffer.close()
+
+    # def delete(self, *args, **kwargs):
+    #     pass
 
     class Meta:
         db_table = 'media_files'

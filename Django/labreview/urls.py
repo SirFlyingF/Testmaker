@@ -4,6 +4,7 @@ from . import views
 xrayurls = [
     path('lab/', views.XRayLabAPI.as_view()),
     path('review/', views.XReviewAPI.as_view()),
+    path('modules/', views.XRayModuleChoicesAPI.as_view()),
 ]
 
 
