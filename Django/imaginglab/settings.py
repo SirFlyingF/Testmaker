@@ -31,8 +31,8 @@ SECRET_KEY = os.getenv('JWT_SECRET')
 DEBUG = os.getenv('DEBUG')
 
 CORS_ORIGIN_ALLOW_ALL = True
-ALLOWED_HOSTS = ['*', 'http://localhost:3000/']
-CSRF_TRUSTED_ORIGINS = ['https://3.110.189.50', 'http://localhost:3000/']
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://3.110.189.50']
 
 # Application definition
 
