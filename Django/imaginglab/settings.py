@@ -33,7 +33,7 @@ DEBUG = os.getenv('DEBUG')
 CORS_ORIGIN_ALLOW_ALL = True
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://3.110.189.50', 'http://localhost']
+CSRF_TRUSTED_ORIGINS = ['https://3.110.189.50', 'http://localhost:3000']
 
 # Application definition
 
