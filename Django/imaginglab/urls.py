@@ -16,18 +16,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.http import HttpResponse
+from django.views import View
+from common.utils.responses import SuccessResponse, MessageResponse
 from labreview.urls import xrayurls, mriurls
 
-def healthcheck(request):
-    return HttpResponse('I am doing great, thanks for asking')
+
+class healthcheck(View):
+    def get(self, request, *args, **kwargs):
+        return MessageResponse('I am doing great, thanks for asking')
+    
+    def post(self, request, *args, **kwargs):
+        return SuccessResponse(request.json) if request.json else MessageResponse('No Request Body')
         
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),
 
-    path('how-you-doin/', healthcheck),
+    path('how-you-doin/', healthcheck.as_view()),
     path('users/', include('user.urls')),
     path('xray/', include(xrayurls)),
     path('mri/', include(mriurls)),
