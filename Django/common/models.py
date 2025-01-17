@@ -184,8 +184,17 @@ class MediaFile(models.Model):
             if 'bytebuffer' in locals():
                 bytebuffer.close()
 
-    # def delete(self, *args, **kwargs):
-    #     pass
+    def delete(self, *args, **kwargs):
+        try:
+            # Delete the files from S3 before deleting the model instance
+            if self.file:
+                self.file.delete(save=False)
+            if self.thumbnail:
+                self.thumbnail.delete(save=False)
+        except Exception as e:
+            print(f"[MediaFile] [delete()] {str(e)}")
+        finally:
+            super().delete(*args, **kwargs)
 
     class Meta:
         db_table = 'media_files'
