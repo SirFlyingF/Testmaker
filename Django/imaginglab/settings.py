@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -178,26 +178,9 @@ MEDIA_ROOT = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # JWT settings
-JWT_ACCESS_EXP = 5
-JWT_REFRESH_EXP = 5
+JWT_ACCESS_EXP = 60
+JWT_REFRESH_EXP = 24*60
 
 # env settings
 JWT_SECRET = os.getenv('JWT_SECRET')
 DOMAIN = os.getenv('DOMAIN')
-
-# Loggers
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.security.csrf': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        }
-    }
-}
