@@ -184,3 +184,20 @@ JWT_REFRESH_EXP = 5
 # env settings
 JWT_SECRET = os.getenv('JWT_SECRET')
 DOMAIN = os.getenv('DOMAIN')
+
+# Loggers
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.security.csrf': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    }
+}
