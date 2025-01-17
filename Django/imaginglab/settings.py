@@ -177,6 +177,10 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 MEDIA_ROOT = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# JWT settings
+JWT_ACCESS_EXP = 5
+JWT_REFRESH_EXP = 5
+
 # env settings
 JWT_SECRET = os.getenv('JWT_SECRET')
 DOMAIN = os.getenv('DOMAIN')

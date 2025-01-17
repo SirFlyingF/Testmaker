@@ -101,12 +101,12 @@ class LoginAPI(View):
                 'isStaff' : user.is_staff,
                 'isSuperuser' : user.is_superuser,
                 'type' : 'ACCESS',
-                'exp' : now+timedelta(minutes=5)
+                'exp' : now+timedelta(minutes=settings.JWT_ACCESS_EXP)
             }
             a_token = jwt.encode(claimset, settings.JWT_SECRET, algorithm="HS256")
 
             claimset['type'] = 'REFRESH'
-            claimset['exp'] = now+timedelta(minutes=60)
+            claimset['exp'] = now+timedelta(minutes=settings.JWT_REFRESH_EXP)
             r_token = jwt.encode(claimset, settings.JWT_SECRET, algorithm="HS256")
 
             ctx = {
