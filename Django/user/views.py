@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 from django.urls import reverse_lazy
 from common.models import User
 from common.utils.responses import *
-from Django.common.utils.view_mixins import JWTRequiredMixin, APIView
+from common.utils.view_mixins import JWTRequiredMixin, APIView
 from datetime import datetime, timedelta
 import jwt
 import random
