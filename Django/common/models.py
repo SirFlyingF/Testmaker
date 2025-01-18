@@ -165,11 +165,8 @@ class MediaFile(models.Model):
         # Generate a thumbnail from uploaded pdf
         try:
             if self.file:
-                if not type(self.file.file).__name__ == 'S3File':
-                    fname, ftype = os.path.splitext(self.file.name)
-                    if not ftype.lower() == '.pdf':
-                        raise TypeError('Unsupported Filetype')
-                    
+                fname, ftype = os.path.splitext(self.file.name)
+                if ftype.lower() == '.pdf':
                     pdf = pypdfium2.PdfDocument(self.file.file)
                     pil_image = pdf.get_page(0).render(scale=1).to_pil()
 
