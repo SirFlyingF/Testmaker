@@ -1,6 +1,6 @@
 from common.models import MediaFile
 from common.utils.responses import *
-from Django.common.utils.view_mixins import JWTRequiredMixin, APIView
+from common.utils.view_mixins import JWTRequiredMixin, APIView
 
 # Create your views here.
 
