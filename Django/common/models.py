@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.files.base import ContentFile
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from io import BytesIO
 import pypdfium2, os
 
@@ -161,27 +163,30 @@ class MediaFile(models.Model):
     file = models.FileField(upload_to='files', null=True, blank=True)
     thumbnail = models.ImageField(upload_to='files', blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        # Generate a thumbnail from uploaded pdf
-        try:
-            if self.file:
-                fname, ftype = os.path.splitext(self.file.name)
-                if ftype.lower() == '.pdf':
-                    pdf = pypdfium2.PdfDocument(self.file.file)
-                    pil_image = pdf.get_page(0).render(scale=1).to_pil()
+    # def save(self, *args, **kwargs):
+    #     # Generate a thumbnail from uploaded pd
+    #     try:
+    #         if self.file:
+    #             fname, ftype = os.path.splitext(self.file.name)
+    #             if ftype.lower() == '.pdf':
+    #                 pdf = pypdfium2.PdfDocument(self.file.file)
+    #                 pil_image = pdf.get_page(0).render(scale=1).to_pil()
 
-                    bytebuffer = BytesIO()
-                    pil_image.save(bytebuffer, 'PNG')
-                    bytebuffer.seek(0)
-                    self.thumbnail.save(f"thumbnail_{fname}.png", ContentFile(bytebuffer.read()), save=False)
+    #                 bytebuffer = BytesIO()
+    #                 pil_image.save(bytebuffer, 'PNG')
+    #                 bytebuffer.seek(0)
+    #                 self.thumbnail.save(f"thumbnail_{fname}.png", ContentFile(bytebuffer.read()), save=False)
 
-            super().save(*args, **kwargs)
-        except Exception as e:
-            print(f"[MediaFile] [save()] {str(e)}")
-            raise TypeError('Unsupported Filetype')
-        finally:
-            if 'bytebuffer' in locals():
-                bytebuffer.close()
+    #             elif not type(self.file.file).__name__ == 'S3File':
+    #                 raise TypeError('Unsupported Filetype')
+                
+    #         super().save(*args, **kwargs)
+    #     except Exception as e:
+    #         print(f"[MediaFile] [save()] {str(e)}")
+    #         raise TypeError('Unsupported Filetype')
+    #     finally:
+    #         if 'bytebuffer' in locals():
+    #             bytebuffer.close()
 
     def delete(self, *args, **kwargs):
         try:
@@ -198,3 +203,31 @@ class MediaFile(models.Model):
     class Meta:
         db_table = 'media_files'
         managed = True
+
+
+
+@receiver(pre_save, sender=MediaFile)
+def generate_thumbnail(sender, instance, **kwargs):
+    """Generate thumbnail for PDF files before saving the model instance"""
+    try:
+        if not instance.file:
+            return
+        
+        if instance.pk:
+            old_instance = MediaFile.objects.get(pk=instance.pk)
+            if old_instance.file == instance.file:
+                return
+
+        fname, ftype = os.path.splitext(instance.file.name)
+        if ftype.lower() == '.pdf':
+            pdf = pypdfium2.PdfDocument(instance.file.file)
+            pil_image = pdf.get_page(0).render(scale=1).to_pil()
+
+            with BytesIO() as bytebuffer:
+                pil_image.save(bytebuffer, 'PNG')
+                bytebuffer.seek(0)
+                instance.thumbnail.save(f"thumbnail_{fname}.png", ContentFile(bytebuffer.read()),save=False)
+
+    except Exception as e:
+        print(f"[MediaFile] [generate_thumbnail()] {str(e)}")
+        raise TypeError('Unsupported Filetype')
