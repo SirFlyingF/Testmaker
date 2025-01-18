@@ -160,33 +160,8 @@ class MediaFile(models.Model):
 
     title = models.CharField(max_length=256, blank=False, help_text="This will be displayed to the user")
     module = models.IntegerField(choices=module_choices) #Use FK for granularity
-    file = models.FileField(upload_to='files', null=True, blank=True)
+    file = models.FileField(upload_to='files', null=True)
     thumbnail = models.ImageField(upload_to='files', blank=True, null=True)
-
-    # def save(self, *args, **kwargs):
-    #     # Generate a thumbnail from uploaded pd
-    #     try:
-    #         if self.file:
-    #             fname, ftype = os.path.splitext(self.file.name)
-    #             if ftype.lower() == '.pdf':
-    #                 pdf = pypdfium2.PdfDocument(self.file.file)
-    #                 pil_image = pdf.get_page(0).render(scale=1).to_pil()
-
-    #                 bytebuffer = BytesIO()
-    #                 pil_image.save(bytebuffer, 'PNG')
-    #                 bytebuffer.seek(0)
-    #                 self.thumbnail.save(f"thumbnail_{fname}.png", ContentFile(bytebuffer.read()), save=False)
-
-    #             elif not type(self.file.file).__name__ == 'S3File':
-    #                 raise TypeError('Unsupported Filetype')
-                
-    #         super().save(*args, **kwargs)
-    #     except Exception as e:
-    #         print(f"[MediaFile] [save()] {str(e)}")
-    #         raise TypeError('Unsupported Filetype')
-    #     finally:
-    #         if 'bytebuffer' in locals():
-    #             bytebuffer.close()
 
     def delete(self, *args, **kwargs):
         try:
@@ -219,15 +194,17 @@ def generate_thumbnail(sender, instance, **kwargs):
                 return
 
         fname, ftype = os.path.splitext(instance.file.name)
-        if ftype.lower() == '.pdf':
-            pdf = pypdfium2.PdfDocument(instance.file.file)
-            pil_image = pdf.get_page(0).render(scale=1).to_pil()
+        if not ftype.lower() == '.pdf':
+            instance.file = None
+            return
+        
+        pdf = pypdfium2.PdfDocument(instance.file.file)
+        pil_image = pdf.get_page(0).render(scale=1).to_pil()
 
-            with BytesIO() as bytebuffer:
-                pil_image.save(bytebuffer, 'PNG')
-                bytebuffer.seek(0)
-                instance.thumbnail.save(f"thumbnail_{fname}.png", ContentFile(bytebuffer.read()),save=False)
+        with BytesIO() as bytebuffer:
+            pil_image.save(bytebuffer, 'PNG')
+            bytebuffer.seek(0)
+            instance.thumbnail.save(f"thumbnail_{fname}.png", ContentFile(bytebuffer.read()),save=False)
 
     except Exception as e:
         print(f"[MediaFile] [generate_thumbnail()] {str(e)}")
-        raise TypeError('Unsupported Filetype')
