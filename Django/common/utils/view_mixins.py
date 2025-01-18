@@ -1,5 +1,7 @@
 from common.utils.responses import UnauthorizedResponse
 from django.conf import settings
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 import jwt
 
 
@@ -18,4 +20,14 @@ class JWTRequiredMixin:
         
         request.META['user'] = claimset
         return super().dispatch(request, *args, **kwargs)
-    
+
+
+class APIView(View):
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        '''Exempts csrf middleware in favour of JWTAuth'''
+        view = super().as_view(**initkwargs)
+        view.cls = cls
+        view.initkwargs = initkwargs
+        return csrf_exempt(view)

@@ -1,12 +1,11 @@
-from django.views import View
 from common.models import MediaFile
 from common.utils.responses import *
-from common.utils.permissions import JWTRequiredMixin
+from Django.common.utils.view_mixins import JWTRequiredMixin, APIView
 
 # Create your views here.
 
 
-class XRayModuleChoicesAPI(JWTRequiredMixin, View):
+class XRayModuleChoicesAPI(JWTRequiredMixin, APIView):
     '''API to get the module choices for XRLab'''
     def get(self, request, *args, **kwargs):
         choices = [
@@ -16,7 +15,7 @@ class XRayModuleChoicesAPI(JWTRequiredMixin, View):
         return SuccessResponse(choices, status=200)
 
 
-class XRayLabAPI(JWTRequiredMixin, View):
+class XRayLabAPI(JWTRequiredMixin, APIView):
     '''API for serving XRay Study Material'''
     def get(self, request, *args, **kwargs):
         module = request.GET.get('module_id')
@@ -36,13 +35,13 @@ class XRayLabAPI(JWTRequiredMixin, View):
         return PaginatedResponse(request, mediafile_qset)
 
 
-class XReviewAPI(JWTRequiredMixin, View):
+class XReviewAPI(JWTRequiredMixin, APIView):
     pass
 
 
-class MRLabAPI(JWTRequiredMixin, View):
+class MRLabAPI(JWTRequiredMixin, APIView):
     pass
 
 
-class MReviewAPI(JWTRequiredMixin, View):
+class MReviewAPI(JWTRequiredMixin, APIView):
     pass
