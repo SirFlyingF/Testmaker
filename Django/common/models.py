@@ -194,10 +194,10 @@ def generate_thumbnail(sender, instance, **kwargs):
                 return
             else:
                 # Delete files from S3 if it has been changed
-                if instance.file:
-                    instance.file.delete(save=False)
-                if instance.thumbnail:
-                    instance.thumbnail.delete(save=False)   
+                if old_instance.file:
+                    old_instance.file.delete(save=False)
+                if old_instance.thumbnail:
+                    old_instance.thumbnail.delete(save=False)   
 
         fname, ftype = os.path.splitext(instance.file.name)
         if not ftype.lower() == '.pdf':
