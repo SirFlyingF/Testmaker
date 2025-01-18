@@ -180,6 +180,7 @@ class MediaFile(models.Model):
             super().save(*args, **kwargs)
         except Exception as e:
             print(f"[MediaFile] [save()] {str(e)}")
+            raise TypeError('Unsupported Filetype')
         finally:
             if 'bytebuffer' in locals():
                 bytebuffer.close()

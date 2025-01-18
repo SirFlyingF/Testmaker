@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.urls import reverse_lazy
+from django.views import View
 from common.models import User
 from common.utils.responses import *
-from common.utils.view_mixins import JWTRequiredMixin, APIView
+from common.utils.view_mixins import JWTRequiredMixin
 from datetime import datetime, timedelta
 import jwt
 import random
@@ -11,7 +12,7 @@ import json
 
 # Create your views here.
 
-class RegisterAPI(APIView):
+class RegisterAPI(View):
     '''API to create user and send email for verification'''
     def post(self, request):
         request_data = json.loads(request.body)
@@ -56,7 +57,7 @@ class RegisterAPI(APIView):
         return MessageResponse('Successfully sent temporary password to email')
 
 
-class VerifyRegisterUserAPI(APIView):
+class VerifyRegisterUserAPI(View):
     def get(self, request):
         token = request.GET.get('token')
         if not token:
@@ -77,7 +78,7 @@ class VerifyRegisterUserAPI(APIView):
             return ErrorResponse(str(e), 500)
 
 
-class LoginAPI(APIView):
+class LoginAPI(View):
     def post(self, request):
         try:
             request_data = json.loads(request.body)
@@ -117,7 +118,7 @@ class LoginAPI(APIView):
             return ErrorResponse(str(e), 500)
 
 
-class RefreshAPI(APIView):
+class RefreshAPI(View):
     '''API to refresh JWT token'''
     def post(self, request):
         request_data = json.loads(request.body)
@@ -141,7 +142,7 @@ class RefreshAPI(APIView):
         return SuccessResponse(ctx, 200)
 
 
-class PasswordResetMailerAPI(APIView):
+class PasswordResetMailerAPI(View):
     '''Sends new randomly generated new password to email'''
     def post(self, request):
         request_data = json.loads(request.body)
@@ -166,7 +167,7 @@ class PasswordResetMailerAPI(APIView):
         return ErrorResponse('User does not exist', 400)
 
 
-class NewPasswordAPI(JWTRequiredMixin, APIView):
+class NewPasswordAPI(JWTRequiredMixin, View):
     '''API to set a randomly generated new password'''
     def post(self, request):
         request_data = json.loads(request.body)
@@ -188,7 +189,7 @@ class NewPasswordAPI(JWTRequiredMixin, APIView):
         return MessageResponse('Password updated successfully')
 
 
-class UserDetailAPI(JWTRequiredMixin, APIView):
+class UserDetailAPI(JWTRequiredMixin, View):
     '''API to manipulate User data'''
     def put(self, request):
         user_id = request.META.get('user').get('id')

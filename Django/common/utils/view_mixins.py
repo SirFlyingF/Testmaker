@@ -23,7 +23,6 @@ class JWTRequiredMixin:
 
 
 class APIView(View):
-
     @classmethod
     def as_view(cls, **initkwargs):
         '''Exempts csrf middleware in favour of JWTAuth'''
