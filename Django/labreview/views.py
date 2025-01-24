@@ -1,6 +1,6 @@
 from common.models import MediaFile
 from common.utils.responses import *
-from common.utils.view_mixins import JWTRequiredMixin
+from common.utils.views import JWTRequiredMixin
 from django.views import View
 
 # Create your views here.
@@ -18,6 +18,7 @@ class XRayModuleChoicesAPI(JWTRequiredMixin, View):
 
 class XRayLabAPI(JWTRequiredMixin, View):
     '''API for serving XRay Study Material'''
+    
     def get(self, request, *args, **kwargs):
         module = request.GET.get('module_id')
         title = request.GET.get('title')

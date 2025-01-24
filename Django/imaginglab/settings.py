@@ -96,6 +96,8 @@ WSGI_APPLICATION = 'imaginglab.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# This DATABASES is for local testing. This is overriden below for 
+# staging ot production environments
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

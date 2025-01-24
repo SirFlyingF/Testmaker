@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from common.models import User
 from common.utils.responses import *
-from common.utils.view_mixins import JWTRequiredMixin
+from common.utils.views import JWTRequiredMixin
 from datetime import datetime, timedelta
 import jwt
 import random
