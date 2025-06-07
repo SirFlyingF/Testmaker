@@ -180,6 +180,31 @@ class MediaFile(models.Model):
         managed = True
 
 
+class Product(models.Model):
+    pass
+
+
+class Payments(models.Model):
+    STARTED = 1
+    PENDING = 2
+    COMPLETED = 3
+    STATUS_CHOICES = (
+        (STARTED, "Started"),
+        (PENDING, "Pending"),
+        (COMPLETED, "Completed")
+    )
+
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL)
+    token = models.TextField()
+    amount = models.FloatField()
+    status = models.IntegerField(choice=STATUS_CHOICES, default=STARTED)
+
+    class Meta:
+        db_table = "payment"
+        verbose_name = "Payment"
+        verbose_name_plural = "Payments"
+        managed = True
+
 
 @receiver(pre_save, sender=MediaFile)
 def generate_thumbnail(sender, instance, **kwargs):
