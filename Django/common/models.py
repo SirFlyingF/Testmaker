@@ -197,7 +197,7 @@ class Payments(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL)
     token = models.TextField()
     amount = models.FloatField()
-    status = models.IntegerField(choice=STATUS_CHOICES, default=STARTED)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=STARTED)
 
     class Meta:
         db_table = "payment"
