@@ -32,7 +32,7 @@ DEBUG = os.getenv('DEBUG')
 
 CORS_ORIGIN_ALLOW_ALL = True
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://main.ds19cgavjtd73.amplifyapp.com', 'https://quantumimaginglab.com']
+CSRF_TRUSTED_ORIGINS = ['https://main.ds19cgavjtd73.amplifyapp.com', 'https://*.quantumimaginglab.com']
 
 # Application definition
 
