@@ -40,7 +40,7 @@ class RegisterAPI(View):
             uzr = User.objects.create_user(email=email, password=password1, display_name=display_name)
 
         token = jwt.encode({'id' : uzr.id, 'exp' : (datetime.now()+timedelta(minutes=5))}, settings.JWT_SECRET, algorithm="HS256")
-        verification_link = f"http://{settings.DOMAIN}{reverse_lazy('verify-user')}?token={token}"
+        verification_link = f"https://{settings.DOMAIN}/verify-user?token={token}"
 
         from_email = f'{settings.EMAIL_HOST_USER}'
         to_email = uzr.email
